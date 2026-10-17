@@ -1,0 +1,36 @@
+# Skeleton only. Backend teammates: add the api service (host port 8080),
+# queue, object store and workers. Requirements: see Part I spec, Section 5.2.
+# The salt must come from the environment: DAY1_SALT: ${DAY1_SALT}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nascon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nascon_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-nascon}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nascon}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+
+  # api:
+  #   build: ./backend
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     DAY1_SALT: ${DAY1_SALT}
+  #     DATABASE_URL: postgresql://${POSTGRES_USER:-nascon}:${POSTGRES_PASSWORD:-nascon_dev_password}@postgres:5432/${POSTGRES_DB:-nascon}
+  #     REDIS_URL: redis://redis:6379/0
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+volumes:
+  pgdata:
