@@ -1,0 +1,57 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DAY1_SALT: ${DAY1_SALT}
+      DATABASE_URL: postgresql://nascon:nascon@db:5432/nascon
+      REDIS_URL: redis://cache:6379
+      QUEUE_URL: amqp://nascon:nascon@queue:5672
+      S3_ENDPOINT: http://object-store:9000
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+      queue:
+        condition: service_started
+      object-store:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nascon
+      POSTGRES_PASSWORD: nascon
+      POSTGRES_DB: nascon
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nascon -d nascon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  cache:
+    image: redis:7-alpine
+
+  queue:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: nascon
+      RABBITMQ_DEFAULT_PASS: nascon
+
+  object-store:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: nascon
+      MINIO_ROOT_PASSWORD: nascon-storage
+    volumes:
+      - object-store-data:/data
+
+volumes:
+  postgres-data:
+  object-store-data:
