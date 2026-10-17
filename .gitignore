@@ -1,0 +1,33 @@
+# Secrets: NEVER commit the real salt
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+
+# Flutter / Dart / Android build output
+mobile/.dart_tool/
+mobile/build/
+mobile/.idea/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+*.iml
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# NOTE: mobile/release/app-release.apk MUST be committed (do not ignore it)
